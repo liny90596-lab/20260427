@@ -82,6 +82,35 @@ function draw() {
           noStroke();
           circle(mappedX, mappedY, 16);
         }
+
+        // 定義需要連線的關鍵點編號群組
+        let segments = [
+          [0, 1, 2, 3, 4],     // 0 到 4 串接
+          [5, 6, 7, 8],        // 5 到 8 串接
+          [9, 10, 11, 12],     // 9 到 12 串接
+          [13, 14, 15, 16],    // 13 到 16 串接
+          [17, 18, 19, 20]     // 17 到 20 串接
+        ];
+
+        // 根據左右手設定線條顏色（與圓點相同）
+        stroke(hand.handedness == "Left" ? color(255, 0, 255) : color(255, 255, 0));
+        strokeWeight(4); // 設定線條粗細
+
+        // 畫出每一組的連線
+        for (let segment of segments) {
+          for (let i = 0; i < segment.length - 1; i++) {
+            let kp1 = hand.keypoints[segment[i]];
+            let kp2 = hand.keypoints[segment[i + 1]];
+
+            // 同樣需要將座標對應到畫布的縮放比例與位移
+            let x1 = map(kp1.x, 0, video.width, x, x + displayW);
+            let y1 = map(kp1.y, 0, video.height, y, y + displayH);
+            let x2 = map(kp2.x, 0, video.width, x, x + displayW);
+            let y2 = map(kp2.y, 0, video.height, y, y + displayH);
+
+            line(x1, y1, x2, y2);
+          }
+        }
       }
     }
   }
