@@ -6,6 +6,7 @@ let video;
 let handPose;
 let hands = [];
 let isVideoReady = false;
+let bubbles = []; // 儲存所有水泡的陣列
 
 function preload() {
   // Initialize HandPose model with flipped video input
@@ -81,6 +82,14 @@ function draw() {
 
           noStroke();
           circle(mappedX, mappedY, 16);
+
+          // 在關鍵點 4, 8, 12, 16, 20 產生水泡
+          let targetPoints = [4, 8, 12, 16, 20];
+          if (targetPoints.includes(i)) {
+            if (frameCount % 2 === 0) { // 控制產生頻率，避免水泡過多
+              bubbles.push(new Bubble(mappedX, mappedY));
+            }
+          }
         }
 
         // 定義需要連線的關鍵點編號群組
@@ -113,5 +122,47 @@ function draw() {
         }
       }
     }
+  }
+
+  // 更新並繪製所有水泡
+  // 水泡會往上串升，當超過影像視窗頂部 (y) 時會「破掉」（從陣列移除）
+  for (let i = bubbles.length - 1; i >= 0; i--) {
+    bubbles[i].update();
+    bubbles[i].display();
+    // 如果水泡飄出影像視窗頂端，則移除
+    if (bubbles[i].y < y) {
+      bubbles.splice(i, 1);
+    }
+  }
+
+  // 在影像視窗上的中間加上一串文字
+  fill(0); // 設定文字顏色為黑色
+  noStroke();
+  textSize(32);
+  textAlign(CENTER, CENTER);
+  text("414730944林宥妘文字", x + displayW / 2, y + displayH / 2);
+}
+
+// 水泡類別
+class Bubble {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.r = random(8, 20); // 隨機大小
+    this.speed = random(2, 5); // 隨機向上速度
+    this.noiseOffset = random(1000); // 增加一點左右晃動的隨機感
+  }
+
+  update() {
+    this.y -= this.speed; // 往上移動
+    this.x += map(noise(this.noiseOffset), 0, 1, -1, 1); // 輕微左右晃動
+    this.noiseOffset += 0.05;
+  }
+
+  display() {
+    stroke(255, 200); // 白色半透明邊框
+    strokeWeight(1);
+    noFill();
+    circle(this.x, this.y, this.r);
   }
 }
