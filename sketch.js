@@ -140,7 +140,7 @@ function draw() {
   noStroke();
   textSize(32);
   textAlign(CENTER, CENTER);
-  text("414730944林宥妘文字", x + displayW / 2, y + displayH / 2);
+  text("414730944林宥妘", width / 2, y / 2);
 }
 
 // 水泡類別
